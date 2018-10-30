@@ -59,7 +59,7 @@ namespace pv{
   }
 
   const Int_t markers[8] = {kFullSquare,kFullCircle,kFullTriangleDown,kOpenSquare,kOpenCircle,kFullTriangleUp,kOpenTriangleDown,kOpenTriangleUp};
-  const Int_t colors[8]  = {kBlack,kBlue,kRed,kGreen+2,kMagenta,kViolet,kCyan,kYellow};
+  const Int_t colors[8]  = {kRed,kBlue,kBlack,kGreen+2,kMagenta,kViolet,kCyan,kYellow};
 
   struct biases {
     
@@ -786,7 +786,7 @@ void MultiRunPVValidation(TString namesandlabels,bool lumi_axis_format,bool time
   TString theTypeLabel="";
   if(lumi_axis_format){
     theType="luminosity";
-    theTypeLabel="processed luminosity (1/fb)";
+    theTypeLabel="Integrated luminosity (fb^{-1})";
     x_ticks = lumiByRun;
   } else {
     if(!time_axis_format){
@@ -1582,7 +1582,7 @@ void outputGraphs(const pv::wrappedTrends& allInputs,
   if(index==(mybundle.getNObjects()-1)){ 
     legend->Draw("same");
     TH1F* theZero = DrawConstantGraph(g_mean,1,0.);
-    theZero->Draw("E1same");
+    theZero->Draw("E1same][");
   }
 	
   auto current_pad = static_cast<TPad*>(gPad);
@@ -1596,6 +1596,7 @@ void outputGraphs(const pv::wrappedTrends& allInputs,
   auto gprime  =  (TGraph*)g_mean->Clone();
   if(index==0){
     gprime->GetYaxis()->SetRangeUser(-10.,10.);
+    gprime->GetXaxis()->SetRangeUser(0,28);
     gprime->Draw("APL");
   } else {
     gprime->Draw("PLsame");
@@ -1607,7 +1608,7 @@ void outputGraphs(const pv::wrappedTrends& allInputs,
   
   if(index==0){
     TH1F* theZero = DrawConstantGraph(gprime,2,0.);
-    theZero->Draw("E1same");
+    theZero->Draw("E1same][");
     
     auto current_pad = static_cast<TPad*>(gPad);
     cmsPrel(current_pad);
@@ -1649,6 +1650,7 @@ void outputGraphs(const pv::wrappedTrends& allInputs,
     
     for(Int_t k=0; k<mybundle.getNObjects() ; k++){
       h_RMS[k]->GetYaxis()->SetRangeUser(-theMax*0.45,theMax*1.40);
+      h_RMS[k]->GetXaxis()->SetRangeUser(0,30);
       if(k==0){
   	h_RMS[k]->Draw("L");
       } else {
@@ -1657,7 +1659,7 @@ void outputGraphs(const pv::wrappedTrends& allInputs,
     }
     legend->Draw("same");
     TH1F* theConst = DrawConstant(h_RMS[index],1,0.);
-    theConst->Draw("same");
+    theConst->Draw("same][");
 
     current_pad = static_cast<TPad*>(gPad);
     cmsPrel(current_pad);
@@ -1818,7 +1820,7 @@ void arrangeOutCanvas(TCanvas *canv, TH1F* m_11Trend[100],TH1F* m_12Trend[100],T
 	}
 	
 	TH1F* theConst = DrawConstant(dBiasTrend[k][i],1,theC);
-	theConst->Draw("PLsame");
+	theConst->Draw("PLsame][");
 
       } else { 
 	dBiasTrend[k][i]->Draw("Le1sames");
@@ -2053,11 +2055,11 @@ void cmsPrel(TPad* pad,size_t ipads) {
   latex->SetTextAlign(33);
   latex->SetTextSize(0.045);
   latex->SetTextFont(42); //22
-  latex->DrawLatex(posX_,posY_,"Internal (13 TeV)");
+  latex->DrawLatex(posX_,posY_,"Preliminary          2018 (13 TeV)");
 
   UInt_t w;
   UInt_t h;
-  latex->GetTextExtent(w,h,"Internal (13 TeV)");
+  latex->GetTextExtent(w,h,"Preliminary          2018 (13 TeV)");
   float size = w/(W/ipads);
   //std::cout<<w<<" "<<" "<<W<<" "<<size<<std::endl;
   float posXCMS_ = posX_- size*(1+0.025*ipads);
@@ -2463,11 +2465,13 @@ void superImposeIOVBoundaries(TCanvas *c,bool lumi_axis_format,bool time_axis_fo
      320377       2018-09-04 18:20:50  5e9cd265167ec543aac49685cf706a58014c08f8  SiPixelTemplateDBObject  
   */
 
-  static const int nIOVs=6 ;//       1         2       3        4        5        6        7        8        9       10       11        12   		      
+  static const int nIOVs=4 ;//       1         2       3        4        5        6        7        8        9       10       11        12   		      
   //int IOVboundaries[nIOVs]  = {  313041,  314881,  315488,  315689,  316559,  316758,  317438,  317527,  318228,  319337,  320377,  320688};
 
-  int IOVboundaries[nIOVs] =  {316758,  317527,  317661,  317664,  318227,  320377};
-  int benchmarkruns[nIOVs]  = {316758,  317527,  317661,  317664,  318227,  320377};
+  //int IOVboundaries[nIOVs] =  {316758,  317527,  317661,  317664,  318227,  320377};
+  //int benchmarkruns[nIOVs]  = {316758,  317527,  317661,  317664,  318227,  320377};
+  int IOVboundaries[nIOVs] =  {316758,  317527,  318227,  320377};
+  int benchmarkruns[nIOVs]  = {316758,  317527,  318227,  320377};
   //int benchmarkruns[nIOVs]  = {  313041,  314881,  315488,  315689,  316559,  316758,  317438,  317527,  318228,  319337,  320377,  320688};
 
   TArrow* IOV_lines[nIOVs];
@@ -2507,7 +2511,7 @@ void superImposeIOVBoundaries(TCanvas *c,bool lumi_axis_format,bool time_axis_fo
       b_lines[IOV] = new TArrow(benchmarkruns[IOV],(c->GetUymin()),benchmarkruns[IOV],0.65*c->GetUymax(),0.5,"|>"); //(c->GetUymin()+0.2*(c->GetUymax()-c->GetUymin()) ),0.5,"|>");
       
     }
-    a_lines[IOV]->SetLineColor(kRed);
+    a_lines[IOV]->SetLineColor(kBlack);
     a_lines[IOV]->SetLineStyle(9);
     a_lines[IOV]->SetLineWidth(1);
     a_lines[IOV]->Draw("same");
@@ -2571,7 +2575,7 @@ void superImposeIOVBoundaries(TCanvas *c,bool lumi_axis_format,bool time_axis_fo
     runnumbers[IOV]->SetLineWidth(1);
     runnumbers[IOV]->SetTextColor(kRed);
     runnumbers[IOV]->SetTextFont(42);
-    runnumbers[IOV]->Draw("same");
+    //runnumbers[IOV]->Draw("same");
   }
 }
 
